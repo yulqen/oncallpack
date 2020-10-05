@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}Update Airport{% endblock %}
+
+{% block content %}
+
+<h2>Update Airport</h2>
+<p>Some blurb here about what an airport is in this system. A place 
+where planes take off and land, yeah?</p>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card bg-primary text-light my-2 p-2">
+                <form method="post" accept-charset="utf-8">{% csrf_token %}
+                    {{ formset.management_form }}
+                    {{ formset.non_form_errors }}
+                    {% crispy org_form %}
+            </div>
+            <div class="card bg-warning my-2 p-2">
+                    {% crispy formset keycontacts_helper %}
+                <input type="submit" value="Save" name="" id="" class="btn btn-primary my-1"/>
+                <a href="{% url "contacts:airport_detail" org_id %}" class="btn btn-danger my-1">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

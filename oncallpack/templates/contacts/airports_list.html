@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% block title %}Organisations{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h2>Airports</h2>
+
+  <table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Airport</th>
+            <th>IATA</th>
+            <th>ICAO</th>
+            <th>Directed Person</th>
+        </tr>
+    </thead> 
+    <tbody>
+        {% for org in organisation_list %}
+        <tr>
+            <td><a href="{% url 'contacts:airport_detail' org.id %}">{{ org.name }}</a></td>
+            <td>{{ org.iata_code }}</td>
+            <td>{{ org.icao_code }}</td>
+            <td>{{ org.directed_person }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock content %}

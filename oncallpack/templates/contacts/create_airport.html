@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}Create New Airport Form{% endblock %}
+
+{% block content %}
+
+<h2>Create New Airport</h2>
+<p>Some blurb here about what an airport is in this system. A place 
+where planes take off and land, yeah?</p>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card bg-primary text-light my-2 p-2">
+                <form method="post" accept-charset="utf-8">
+                {{ formset.management_form }}
+                {{ formset.non_form_errors }}
+                {% crispy airport_form %} 
+            </div>
+            <div class="card bg-warning my-2 p-2">
+                {% crispy formset keycontacts_helper %}
+                <input type="submit" value="Save" name="" id="" class="btn btn-primary"/>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

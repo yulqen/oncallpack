@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% block title %}Contacts{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <h2>Contacts</h2>
+  <p>This is where we link to all the Contacts-related items in the system.</p>
+
+  <ul class="list-group">
+      <li class="list-group-item"><i class="fas fa-plane-departure"></i> <a href={% url "contacts:airports_list" %}>Airports</a></li>
+      <li class="list-group-item"><i class="fas fa-shuttle-van"></i> <a href={% url "contacts:police_list" %}>Police Forces</a></li> 
+  </ul>
+  
+</div>
+
+{% endblock content %}

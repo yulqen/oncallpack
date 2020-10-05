@@ -1,0 +1,175 @@
+- name: Add the user {{ server_username }}
+  become: yes
+  user:
+    name: "{{ server_username }}"
+    shell: /bin/bash
+
+- name: Create ssh directory
+  become: yes
+  become_user: "{{ server_username }}"
+  file:
+    group: "{{ server_username }}"
+    owner: "{{ server_username }}"
+    state: directory
+    path: "/home/lemon/.ssh"
+    mode: 0700
+
+- name: chown the source code
+  become: yes
+  file:
+    owner: "{{ server_username }}"
+    group: "{{ server_username }}"
+    state: directory
+    recurse: yes
+    path: "/lemon/code/oncallpack"
+
+- name: Copy id_pub key to guest
+  become: yes
+  become_user: "{{ server_username }}"
+  copy:
+    src:  "/home/lemon/.ssh/id_rsa.pub"
+    dest: "/home/{{ server_username }}/.ssh/authorized_keys"
+    mode: 0600
+
+- name: update apt
+  become: yes
+  apt: update_cache=yes
+
+- name: Install system packages
+  become: yes
+  apt: name={{ item }} state=present
+  with_items: "{{ system_packages }}"
+
+  #- name: Create python binary directories
+  #  become: yes
+  #  file:
+  #    group: "{{ server_username }}"
+  #    owner: "{{ server_username }}"
+  #    state: directory
+  #    path: "{{ installed_python_path }}"
+  #
+  #- name: Create a Download directory
+  #  become: yes
+  #  become_user: "{{ server_username }}"
+  #  file:
+  #    group: "{{ server_username }}"
+  #    owner: "{{ server_username }}"
+  #    state: directory
+  #    path: "{{ downloads_dir }}"
+  #
+  #- name: Test for downloaded Python tarball
+  #  stat:
+  #    path: "{{ downloads_dir }}/Python-{{ required_python_version }}.tar.xz"
+  #  register: py
+  #
+  #- name: Test for newly-installed Python installation
+  #  stat:
+  #    path: "{{ installed_python_path }}/bin/python3.6"
+  #  register: pybin
+  #
+  #- name: Debug!
+  #  debug:
+  #    msg: "Python binary exists"
+  #  when: pybin.stat.exists
+  #
+  #- name: Download Python installation files
+  #  become: yes
+  #  get_url:
+  #    group: "{{ server_username }}"
+  #    owner: "{{ server_username }}"
+  #    url: https://www.python.org/ftp/python/{{ required_python_version }}/Python-{{ required_python_version }}.tar.xz
+  #    dest: "{{ downloads_dir }}"
+  #  when: not py.stat.exists
+  #
+  #- name: Unpack Python installation files
+  #  become: yes
+  #  become_user: "{{ server_username }}"
+  #  unarchive:
+  #    src: "{{ downloads_dir }}/Python-{{ required_python_version }}.tar.xz"
+  #    dest: "{{ downloads_dir }}"
+  #    remote_src: yes
+  #  when: not pybin.stat.exists
+  #
+  #- name: Configure Python source files
+  #  become: yes
+  #  become_user: "{{ server_username }}"
+  #  command: ./configure --prefix="{{ installed_python_path }}" --enable-shared
+  #  args:
+  #    chdir: "{{ downloads_dir }}/Python-{{ required_python_version }}"
+  #  when: not pybin.stat.exists
+  #
+  #- name: Make Python source files
+  #  become: yes
+  #  become_user: "{{ server_username }}"
+  #  command: make
+  #  args:
+  #    chdir: "{{ downloads_dir }}/Python-{{ required_python_version }}"
+  #  when: not pybin.stat.exists
+  #
+  #- name: Make install Python source files
+  #  become: yes
+  #  become_user: "{{ server_username }}"
+  #  command: make install
+  #  args:
+  #    chdir: "{{ downloads_dir }}/Python-{{ required_python_version }}"
+  #  when: not pybin.stat.exists
+
+- name: Install base Python packages (for system use)
+  become: yes
+  pip:
+    name: "{{ item }}"
+    executable: "pip3"
+  loop: "{{ python_packages }}"
+
+- name: Create virtualenv directory
+  become: yes
+  file:
+      group: "{{ server_username }}"
+      owner: "{{ server_username }}"
+      mode: 0755
+      state: directory
+      path: "{{ virtualenv_root }}"
+
+- name: Create a logs directory
+  become: yes
+  file:
+    group: "{{ server_username }}"
+    owner: "{{ server_username }}"
+    mode: 0755
+    state: directory
+    path: "{{ logs_root }}"
+
+- name: Set up oncallpack virtualenv
+  become: yes
+  become_user: "{{ server_username }}"
+  pip:
+      requirements: "{{ item }}"
+      virtualenv: "{{ virtualenv_root }}/{{ project_name }}"
+#     virtualenv_python: "{{ installed_python_path }}/bin/python3.6"
+      virtualenv_python: "python3.6"
+  loop: "{{ requirements_files }}"
+
+- name: ensure database user is created
+  become: yes
+  become_user: postgres
+  postgresql_user:
+    name: lemon
+    password: lemon
+    encrypted: yes
+    role_attr_flags: CREATEDB,SUPERUSER
+
+- name: create database
+  become: yes
+  become_user: postgres
+  postgresql_db:
+    name: oncallpack
+
+- name: migrate database
+  become: yes
+  become_user: "{{ server_username }}"
+  django_manage:
+    command: migrate
+    app_path: "{{ project_path }}"
+    # you have to change this to config.settings.staging for vagrant
+    settings: 'config.settings.local'
+    virtualenv: "{{ virtualenv_root }}/{{ project_name }}"

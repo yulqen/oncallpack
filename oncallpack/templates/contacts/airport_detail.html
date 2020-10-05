@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% block title %}{{ object.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h2 class="card-title">{{ object.name }}</h2>
+                <h6 class="card-subtitle mb-2 text-light">Updated: {{ object.modified|date:"d F Y" }}</h6>
+                <div class="container-fluid">
+                    <div class="row py-2">
+                        <div class="col-sm">
+                            <strong>IATA</strong>: {{ object.iata_code }}
+                        </div>
+                        <div class="col-sm">
+                            <strong>ICAO</strong>: {{ object.icao_code }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm">
+                            <strong>General No: </strong>{{ object.main_phone }}
+                        </div>
+                        <div class="col-sm">
+                            <strong>Web site: </strong>{{ object.website }}
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            <div class="container">
+                <a href="{% url 'contacts:airport_update' object.id %}" class="text-light">Edit</a> 
+            </div>
+        </div>
+
+        {% for o in object.keycontact_set.all|dictsort:"priority" %}
+        <div class="card bg-warning my-1 my-1">
+           <div class="card-body">
+            <h3 class="card-title">{{ o.name }}</h3>
+            <h6 class="card-subtitle mb-2 text-muted">Updated: {{ o.modified|date:"d F Y" }}</h6>
+            <div class="list-group">
+                <li class="list-group-item"><strong>Notes:</strong> {{ o.notes }}</li>
+                <li class="list-group-item"><strong>Tel:</strong> {{ o.tel }}</li>
+                <li class="list-group-item"><strong>Fax:</strong> {{ o.fax }}</li>
+                <li class="list-group-item"><strong>Surefax:</strong> {{ o.surefax }}</li>
+                <li class="list-group-item"><strong>Mobile:</strong> {{ o.mobile }}</li>
+                <li class="list-group-item"><strong>Home:</strong> {{ o.home }}</li>
+              <li class="list-group-item"><strong>Email:</strong> <a href="mailto:{{ o.email }}">{{ o.email }}</a></li>
+                {% if o.tfh_template == "NO" %}
+                <li class="list-group-item bg-danger"><strong>24hr:</strong><span class="text-light"> {{ o.tfh_template }}</span></li>
+                {% else %}
+                    <li class="list-group-item"><strong>24hr:</strong> {{ o.tfh_template }}</li>
+                {% endif %}
+            </div>
+           </div>
+        </div>
+        {% endfor %}
+
+
+        {% if object.directed_person %}
+        <div class="card my-1">
+           <div class="card-body">
+               <h3 class="card-title">Directed Person</h3>
+               <h5>{{ object.directed_person.name }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Updated: {{ object.modified|date:"d F Y" }}</h6>
+                <div class="list-group list-group-flush">
+                    <li class="list-group-item list-group-item-action"><strong>Tel:</strong> {{ object.directed_person.tel }}</li>
+                    <li class="list-group-item list-group-item-action"><strong>Mobile:</strong> {{ object.directed_person.mobile }}</li>
+                    <li class="list-group-item list-group-item-action"><strong>Home:</strong> {{ object.directed_person.home }}</li>
+                    <li class="list-group-item"><strong>Fax:</strong> {{ object.directed_person.fax }}</li>
+                    <li class="list-group-item"><strong>Surefax:</strong> {{ object.directed_person.surefax }}</li>
+                </div>
+           </div> 
+        </div>
+        {% endif %}
+
+        <!-- - no Directed Person in this queryset --> 
+        {% for o in object.people_no_directed_party %}
+        <div class="card my-1">
+           <div class="card-body">
+               <h3 class="card-title">{{ o.role.first.name }}</h3>
+               <h5>{{ o.name }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Updated: {{ o.modified|date:"d F Y" }}</h6>
+                <div class="list-group list-group-flush">
+                    <li class="list-group-item list-group-item-action"><strong>Tel:</strong> {{ o.tel }}</li>
+                    <li class="list-group-item list-group-item-action"><strong>Mobile:</strong> {{ o.mobile }}</li>
+                    <li class="list-group-item list-group-item-action"><strong>Home:</strong> {{ o.home }}</li>
+                    <li class="list-group-item"><strong>Fax:</strong> {{ o.fax }}</li>
+                    <li class="list-group-item"><strong>Surefax:</strong> {{ o.surefax }}</li>
+                </div>
+           </div> 
+        </div>
+        {% endfor %}
+
+
+        <div class="card my-2 bg-info">
+            <div class="card-body">
+                <h3 class="card-title">{{ object.local_police.name|upper }}</h3>
+                <h6 class="card-subtitle mb-2 text-light">Updated: {{ object.modified|date:"d F Y" }}</h6>
+                <div class="list-group">
+                    <li class="list-group-item"><strong>Tel:</strong> {{ object.local_police.main_phone }}</li>
+                </div>
+            </div>
+        </div>
+                </div>
+            </div>
+        </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,51 @@
+# you might have to uninstall apache2 package if you get an error installing
+# nginx-full
+system_packages:
+  - virtualenv
+  - acl # fix privilege issue: https://stackoverflow.com/questions/36646880/ansible-2-1-0-using-become-become-user-fails-to-set-permissions-on-temp-file
+  - postgresql
+  - libpq-dev # Required for Ansible to interact with postgres
+  - build-essential
+  - git
+  - python3-dev
+  - python-dev
+  - python-setuptools
+  - python3-pip
+  - python3-virtualenv
+  - make
+  - build-essential
+  - libssl-dev
+  - zlib1g-dev
+  - libbz2-dev
+  - libreadline-dev
+  - libsqlite3-dev
+  - wget
+  - curl
+  - llvm
+  - libncurses5-dev
+  - xz-utils
+  - tk-dev
+  - libpython3-dev
+  - supervisor
+  - nginx-full
+  - vim
+
+python_packages:
+  - psycopg2-binary
+
+
+postgresql_database_name: oncallpack
+postgresql_password: lemon
+postgresql_user: lemon
+server_username: lemon
+project_path: /lemon/code/oncallpack
+project_name: oncallpack
+downloads_dir: /home/lemon/Downloads
+virtualenv_root: /lemon/virtualenvs
+logs_root: "{{ project_path }}/logs"
+requirements_files:
+  - "{{ project_path }}/requirements/base.txt"
+  - "{{ project_path }}/requirements/local.txt"
+  - "{{ project_path }}/requirements/production.txt"
+required_python_version: 3.6.5
+installed_python_path: /home/lemon/python{{ required_python_version }}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static i18n %}
+{% load class_name %}
+
+{% block title %}Search{% endblock %}
+
+{% block content %}
+<div class="container">
+
+{% if search_results %}
+  <div class="row title-row my-5">
+      <div class="col-12 py-0">
+          <h3 class="my-0 py-0">Search Results</h3>
+      </div>
+  </div>
+{% endif %}
+
+{% for object in object_list %}
+    {% with object|class_name as klass %}
+      {% if klass == 'Organisation' %}
+           <div class='row'>
+             <div class='col-12'>
+                 Organistion: <a href='{% url 'contacts:airport_detail' object.id %}'>{{ object.name }}</a>
+            </div>
+          </div>
+
+        <!-- need to replace these two models with mine -->
+
+      {% elif klass == 'Person' %}
+           <div class='row'>
+             <div class='col-12'>
+                Person: <a href='#'>{{ object.name }}</a>
+              </div>
+            </div>
+
+        <!-- need to replace these two models with mine -->
+      {% elif klass == 'Profile' %}
+           <div class='row'>
+                <div class='col-12'>
+                   Lesson Item: <a href=''>{{ object.title }}</a>
+                </div>
+            </div>
+      {% else %}
+           <div class='row'>
+             <div class='col-12 col-lg-8 offset-lg-4'>
+                <a href=''>{{ object }} | {{ object|class_name }}</a>
+            </div>
+           </div>
+        {% endif %}
+    {% endwith %}
+
+{% empty %}
+<div class='row'>
+
+    <div class="align-bottom w-100 text-center">
+        <h2>Search</h2>
+    </div>
+    <div class='col-12 col-md-6 mx-auto my-5 py-5'>
+        <form method='GET' class='' action='.'>
+            <div class="input-group form-group-no-border mx-auto" style="margin-bottom: 0px; font-size: 32px;">
+                <div class="input-group-prepend cfe-nav w-100">
+                    <span class="input-group-text" style='color:#144'>
+                        Press enter to search:
+                    </span>
+                        <!--<input type="text" name="q" data-toggle="popover" data-placement="bottom" data-content="Press enter to search" class="form-control cfe-nav mt-0 py-3" placeholder="Search..." value="" style="" data-original-title="" title="" autofocus="autofocus"> -->
+                        <input type="text" name="q" data-toggle="popover" data-placement="bottom" data-content="Press enter to search" class="form-control cfe-nav mt-0 py-3" placeholder="" value="" style="" data-original-title="" title="" autofocus="autofocus">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endfor %}
+
+</div>
+{% endblock content %}
